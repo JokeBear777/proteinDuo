@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor
 public class Exercise {
-            ///
+
     @Id
     @Column(name = "exercise_id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
