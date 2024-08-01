@@ -1,4 +1,4 @@
-package com.proteinduo.domain.memberManage.entity;
+package com.proteinduo.domain.exerciseManage.entity;
 
 import jakarta.persistence.*;
 import lombok.Builder;
