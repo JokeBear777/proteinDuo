@@ -4,9 +4,16 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * <br>package name   : com.proteinduo.domain.memberManage.entity
@@ -32,8 +39,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "member")
 @Getter
-@NoArgsConstructor
-public class Member {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Member implements UserDetails { //인증 객체로 사용
 
     @Id
     @Column(name = "member_id", nullable = false)
@@ -47,9 +54,6 @@ public class Member {
 
     @Column(name = "email", nullable = true)
     private String email;
-
-    @Column(name = "enabled", nullable = false)
-    private boolean enabled;
 
     @Column(name = "gender", nullable = false)
     private String gender;
@@ -73,14 +77,13 @@ public class Member {
     private Integer bodyFatPercentage;
 
     @Builder
-    public Member(String memberId, String password, String username, String email, boolean enabled, String gender,
+    public Member(String memberId, String password, String username, String email,  String gender,
                  Integer height, Integer weight, Integer muscleMass, Integer bodyFat,
                  int bmi, int bodyFatPercentage) {
         this.memberId = memberId;
         this.password = password;
         this.username = username;
         this.email = email;
-        this.enabled = enabled;
         this.gender = gender;
         this.height = height;
         this.weight = weight;
@@ -88,6 +91,37 @@ public class Member {
         this.bodyFat = bodyFat;
         this.bmi = bmi;
         this.bodyFatPercentage = bodyFatPercentage;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("user"));
+    }
+
+
+    @Override
+    public String getUsername() {
+        return this.username;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 
 

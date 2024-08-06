@@ -1,9 +1,13 @@
 package com.proteinduo.domain.memberManage.api;
 
+import com.proteinduo.domain.memberManage.dto.AddMemberRequest;
 import com.proteinduo.domain.memberManage.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -30,12 +34,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class MemberController {
+public class loginAPIController {
 
     private final MemberService memberService;
+    private final UserDetailsService userDetailsService;
 
-    @GetMapping("/test")
-    ResponseEntity<String> test() {
-        return ResponseEntity.ok("hello world");
+
+    //회원가입
+    @PostMapping("/signup")
+    public ResponseEntity<String> signup(@RequestBody AddMemberRequest request) {
+        memberService.save(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Signup successful. Please log in.");
     }
+
+    //로그아웃
+
 }

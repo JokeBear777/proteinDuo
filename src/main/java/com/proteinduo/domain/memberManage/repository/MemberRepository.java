@@ -1,8 +1,10 @@
-package com.proteinduo.domain.memberManage.dto;
+package com.proteinduo.domain.memberManage.repository;
 
 import com.proteinduo.domain.memberManage.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 /**
  * <br>package name   : com.proteinduo.domain.memberManage.dto
@@ -27,5 +29,5 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
-    //
+    Optional<Member> findByMemberId(String memberId);//memberId로 사용자 정보를 가지고 온다
 }

@@ -1,5 +1,12 @@
 package com.proteinduo.domain.memberManage.service;
 
+import com.proteinduo.domain.memberManage.dto.AddMemberRequest;
+import com.proteinduo.domain.memberManage.entity.Member;
+import com.proteinduo.domain.memberManage.repository.MemberRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
 /**
  * <br>package name   : com.proteinduo.domain.memberManage.service
  * <br>file name      : MemberService
@@ -21,5 +28,23 @@ package com.proteinduo.domain.memberManage.service;
  * 2024-07-28        jack8              init create
  * </pre>
  */
-public interface MemberService {
+
+@RequiredArgsConstructor
+@Service
+public class MemberService {
+
+    private final MemberRepository memberRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    //회원가입
+    public String save (AddMemberRequest dto) {
+        return memberRepository.save(Member.builder()
+                .memberId(dto.getMemberId())
+                .password(bCryptPasswordEncoder.encode(dto.getPassword()))
+                .build()).getMemberId();
+    }
+
+    //로그인 확인
+
+
 }
