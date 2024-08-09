@@ -1,6 +1,8 @@
 package com.proteinduo.domain.memberManage.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -14,12 +16,13 @@ import lombok.Setter;
  * -----------------------------------------------------------
  * 2024-08-05        82102       최초 생성
  */
+
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class AddMemberRequest {
     private String memberId;
     private String password;
-
-
 }
 

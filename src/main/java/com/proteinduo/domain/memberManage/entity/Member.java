@@ -1,9 +1,7 @@
 package com.proteinduo.domain.memberManage.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.proteinduo.domain.memberManage.dto.MemberInfoRequest;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -43,25 +41,26 @@ import java.util.List;
 public class Member implements UserDetails { //인증 객체로 사용
 
     @Id
-    @Column(name = "member_id", nullable = false)
+    @Column(name = "member_id", nullable = false, unique = true, updatable = false)
     private String memberId;
 
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "username", nullable = false)
+    //이하 사용자 Info
+    @Column(name = "username", nullable = true)
     private String username;
 
     @Column(name = "email", nullable = true)
     private String email;
 
-    @Column(name = "gender", nullable = false)
+    @Column(name = "gender", nullable = true)
     private String gender;
 
-    @Column(name = "height", nullable = false)
+    @Column(name = "height", nullable = true)
     private Integer height;
 
-    @Column(name = "weight", nullable = false)
+    @Column(name = "weight", nullable = true)
     private Integer weight;
 
     @Column(name = "muscle_mass", nullable = true) //골격근량
@@ -70,7 +69,7 @@ public class Member implements UserDetails { //인증 객체로 사용
     @Column(name = "bodyFat", nullable = true) //체지방량
     private Integer bodyFat;
 
-    @Column(name = "bmi", nullable = false)
+    @Column(name = "bmi", nullable = true)
     private Integer bmi;
 
     @Column(name = "body_fat_percentage", nullable = true) //체지방률
@@ -122,6 +121,30 @@ public class Member implements UserDetails { //인증 객체로 사용
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public void update(MemberInfoRequest memberInfoRequest) {
+        this.username = memberInfoRequest.getUsername();
+        this.email = memberInfoRequest.getUsername();
+        this.gender = memberInfoRequest.getUsername();
+        this.height = memberInfoRequest.getHeight();
+        this.weight = memberInfoRequest.getWeight();
+        this.muscleMass = memberInfoRequest.getMuscleMass();
+        this.bodyFat = memberInfoRequest.getBodyFat();
+        this.bmi = memberInfoRequest.getBmi();
+        this.bodyFatPercentage = memberInfoRequest.getBodyFatPercentage();
+    }
+
+    public void deleteInfo() {
+        this.username = null;
+        this.email = null;
+        this.gender = null;
+        this.height = null;
+        this.weight = null;
+        this.muscleMass = null;
+        this.bodyFat = null;
+        this.bmi = null;
+        this.bodyFatPercentage = null;
     }
 
 

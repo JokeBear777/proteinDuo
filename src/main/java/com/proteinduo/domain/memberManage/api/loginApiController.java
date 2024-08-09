@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class loginAPIController {
+public class loginApiController {
 
     private final MemberService memberService;
     private final UserDetailsService userDetailsService;

@@ -24,11 +24,11 @@ public class UserDetailService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
     
-    //사용자 memberID으로 사용자 정보를 가져오는 메서드
+    //사용자 ID으로 사용자 정보를 가져오는 메서드
     @Override
-    public Member loadUserByUsername(String name) {
-        return memberRepository.findByMemberId(name)
-                .orElseThrow(()-> new IllegalArgumentException(name));
+    public Member loadUserByUsername(String loginId) {
+        return memberRepository.findByMemberId(loginId)
+                .orElseThrow(()-> new IllegalArgumentException(loginId));
     }
 
 }
