@@ -7,6 +7,7 @@ import com.proteinduo.domain.memberManage.service.MemberService;
 import com.proteinduo.domain.memberManage.service.UserDetailService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +15,24 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.delete;
+import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.post;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * packageName    : com.proteinduo.domain.memberManage.api
@@ -37,69 +50,93 @@ import static org.junit.jupiter.api.Assertions.*;
 @AutoConfigureMockMvc
 public class MemberApiControllerTest {
 
+    @Autowired
+    private WebApplicationContext context;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private MemberService memberService;
+
+    private MockMvc mvc;
+
+
     private static ObjectMapper objectMapper = new ObjectMapper();
     private static MvcResult loginResult;
 
     @BeforeEach
     public void signup() throws Exception {
         //가상 회원가입
-        AddMemberRequest signupRequest = new AddMemberRequest();
-        signupRequest.setMemberId("12345");
-        signupRequest.setPassword("password");
+        mvc = MockMvcBuilders
+                .webAppContextSetup(this.context)
+                .apply(springSecurity())
+                .build();
 
-        Mockito.when(memberService.save(signupRequest)).thenReturn(null);
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/member/signup")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(signupRequest)))
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.content().string("Signup successful. Please log in."));
+        AddMemberRequest addMemberRequest = new AddMemberRequest("abcd", "1234");
+        memberService.save(addMemberRequest);
 
         // 로그인
-        loginResult = mockMvc.perform(MockMvcRequestBuilders.post("/login")
-                        .param("username", "12345")
-                        .param("password", "password"))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andReturn();
+        // given
+        String userId = "abcd";
+        String password = "1234";
+
+        // when
+        mvc.perform(formLogin().user(userId).password(password))
+                .andDo(print())
+                // then
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/home"));
 
 
     }
 
 
-
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private MemberService memberService;
-
-    @MockBean
-    private UserDetailService userDetailSErvice;
-
     @Test
-    public void testGetMemberInfo() throws Exception{
-        // Given
-        String memberId = "12345";
-        MemberInfoRequest memberInfoRequest = new MemberInfoRequest();
-        memberInfoRequest.setUsername("protein");
-        memberInfoRequest.setEmail("protein@example.com");
+    @WithMockUser(username = "abcd")
+    @DisplayName("getMemberInfo() : 유저의 정보를 가지고 온다")
+    public void testGetMemberInfo() throws Exception {
 
-        // When & Then
-        mockMvc.perform(MockMvcRequestBuilders.post("/member/{memberId}", memberId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(memberInfoRequest)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-
-        Mockito.verify(memberService).memberInfoSave(Mockito.eq(memberId), Mockito.any(MemberInfoRequest.class));
+        mvc.perform(get("/member/{memberId}", "abcd"))
+                .andDo(print())
+                .andExpect(status().isOk());
     }
 
 
+
     @Test
-    void registerMemberInfo() {
+    @WithMockUser(username = "abcd")
+    @DisplayName("registerMemberInfo() : 유저의 정보를 등록/수정 한다")
+    void registerMemberInfo() throws Exception{
+        //given
+        MemberInfoRequest memberInfoRequest = new MemberInfoRequest(
+
+                "unikal",
+                "test@example.com",
+                "male",
+                177,
+                110,
+                35,
+                15,
+                23,
+                18
+        );
+
+        //when&&then
+        mvc.perform(MockMvcRequestBuilders.post("/member/{memberId}", "abcd")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(memberInfoRequest)))
+                .andDo(print())
+                .andExpect(status().isCreated());
+
     }
 
     @Test
-    void deleteMemberInfo() {
+    @WithMockUser(username = "abcd")
+    @DisplayName("registerMemberInfo() : 유저의 정보를 삭제 한다")
+    public void deleteMemberInfo() throws Exception{
+        mvc.perform(MockMvcRequestBuilders.delete("/member/{memberId}", "abcd"))
+                .andDo(print())
+                .andExpect(status().isOk());
     }
 }
