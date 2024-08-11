@@ -46,20 +46,42 @@ public class MemberApiController {
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        catch (Exception e) {
+            // 기타 서버 에러가 발생한 경우
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     // 유저 정보 CREATED || UPDATE
     @PostMapping
     public ResponseEntity<Void> registerMemberInfo(@PathVariable String memberId, @RequestBody MemberInfoRequest memberInfoRequest) {
-
-        memberService.memberInfoSave(memberId, memberInfoRequest);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        try {
+            // memberService의 로직이 정상적으로 실행되면 성공 처리
+            memberService.memberInfoSave(memberId, memberInfoRequest);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            // 잘못된 요청으로 인해 발생한 예외의 경우
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            // 기타 서버 에러가 발생한 경우
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     // 유저 정보 DELETE
     @DeleteMapping
     public ResponseEntity<Void> deleteMemberInfo(@PathVariable String memberId) {
-        memberService.memberInfoDelete(memberId);
-        return new ResponseEntity<>(HttpStatus.OK);
+        try {
+            //로직이 정상적으로 실행되면 성공 처리
+            memberService.memberInfoDelete(memberId);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            // 잘못된 요청으로 인해 발생한 예외의 경우
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            // 기타 서버 에러가 발생한 경우
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
+
 }

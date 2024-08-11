@@ -21,17 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class MemberViewController {
-    //로그인 뷰
-    @GetMapping("/login")
-    public String login(){
-        return "login";
-    }
-    
-    //회원가입 뷰
-    @GetMapping("/signup")
-    public String signup() {
-        return "signup";
-    }
+
     
     //로그아웃 뷰
     @GetMapping("/logout")
