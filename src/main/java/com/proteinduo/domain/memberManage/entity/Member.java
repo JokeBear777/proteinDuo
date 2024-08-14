@@ -1,6 +1,7 @@
 package com.proteinduo.domain.memberManage.entity;
 
 import com.proteinduo.domain.memberManage.dto.MemberInfoRequest;
+import com.proteinduo.domain.routineManage.entity.Routine;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -74,6 +75,10 @@ public class Member implements UserDetails { //인증 객체로 사용
 
     @Column(name = "body_fat_percentage", nullable = true) //체지방률
     private Integer bodyFatPercentage;
+
+
+    @OneToMany(mappedBy = "member")
+    private List<Routine> routine;
 
     @Builder
     public Member(String memberId, String password, String username, String email,  String gender,
