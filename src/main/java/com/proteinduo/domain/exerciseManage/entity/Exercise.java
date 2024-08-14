@@ -1,5 +1,6 @@
 package com.proteinduo.domain.exerciseManage.entity;
 
+import com.proteinduo.domain.routineManage.entity.Routine;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,12 +18,6 @@ public class Exercise {
     @Column(name = "exercise_id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer exerciseId;
-
-    @Column(name="user_id", nullable = false)
-    private String userId;
-
-    @Column(name = "routine_name", nullable = false)
-    private String routineName;
 
     @Column(name = "exercise_name", nullable = false)
     private String exerciseName;
@@ -45,12 +40,15 @@ public class Exercise {
     @Column(name = "created_at", nullable = false)
     public LocalDate createdAt;
 
+    @ManyToOne
+    @JoinColumn(name = "routine_id")
+    private Routine routine;
+
     @Builder
-    public Exercise(Integer exerciseId, String userId, String routineName, String exerciseName, Integer weight,
+    public Exercise(Integer exerciseId,  Routine routine, String exerciseName, Integer weight,
                     Integer reps, Integer sets, Integer restTime, Integer cycle, LocalDate createdAT){
         this.exerciseId = exerciseId;
-        this.userId = userId;
-        this.routineName = routineName;
+        this.routine = routine;
         this.exerciseName = exerciseName;
         this.weight = weight;
         this.reps = reps;
