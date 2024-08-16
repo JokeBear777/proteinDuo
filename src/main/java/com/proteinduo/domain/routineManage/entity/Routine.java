@@ -49,7 +49,7 @@ public class Routine {
     private Member member;
 
     @OneToMany(mappedBy = "routine")
-    private List<Exercise> exercise;
+    private List<Exercise> exercises;
 
     @Builder
     public Routine(Member member, String routineName, LocalDate createdAt, Integer perWeek) {

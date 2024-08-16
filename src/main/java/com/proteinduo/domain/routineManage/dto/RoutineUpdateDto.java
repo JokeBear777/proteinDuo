@@ -1,13 +1,11 @@
 package com.proteinduo.domain.routineManage.dto;
 
-import com.proteinduo.domain.exerciseManage.dto.ExerciseDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.List;
 
 /**
  * packageName    : com.proteinduo.domain.routineManage.dto

@@ -1,5 +1,6 @@
 package com.proteinduo.domain.exerciseManage.dto;
 
+import com.proteinduo.domain.exerciseManage.entity.ExerciseType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,15 +24,10 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ExerciseDto {
-    private Integer exerciseId;
-    private String exerciseName;
-    private Integer weight;
-    private Integer reps;
-    private Integer sets;
-    private Integer restTime;
-    private Integer cycle;
-    private LocalDate createdAt;
+public class AddExerciseDto {
 
-    // Getters and Setters
+   // private Integer routineId;
+    private ExerciseType exerciseType;
+
+
 }
