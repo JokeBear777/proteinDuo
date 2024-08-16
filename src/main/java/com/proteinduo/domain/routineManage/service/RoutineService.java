@@ -43,11 +43,6 @@ public class RoutineService {
     }
 
 
-    @Transactional
-    public Routine createRoutine(Routine routine) {
-
-        return routineRepository.save(routine);
-    }
 
     @Transactional(readOnly = true)
     public List<Routine> getRoutinesByMemberId(String memberId) {
@@ -63,7 +58,7 @@ public class RoutineService {
     public Routine createRoutine(String memberId, CreateRoutineDto createRoutineDto) {
 
         Member member = memberRepository.findByMemberId(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found with ID: " + memberId));
+                    .orElseThrow(() -> new IllegalArgumentException("Member not found with ID: " + memberId));
 
         Routine routine = Routine.builder()
                 .member(member)

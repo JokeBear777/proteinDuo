@@ -5,6 +5,8 @@ import com.proteinduo.domain.routineManage.entity.Routine;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
  * packageName    : com.proteinduo.domain.exerciseManage.repository
  * fileName       : ExerciseRepository
@@ -18,4 +20,8 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface ExerciseRepository extends JpaRepository<Exercise, Long> {
+    Optional<Exercise> findByExerciseId(Integer exerciseId);
+    Boolean existsByExerciseId(Integer exerciseId);
+    void deleteByExerciseId(Integer eId);
+
 }

@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "exercise")
@@ -19,43 +20,20 @@ public class Exercise {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer exerciseId;
 
-    @Column(name = "exercise_name", nullable = false)
-    private String exerciseName;
-
-    @Column(name = "weight", nullable = false) //kg
-    private Integer weight;
-
-    @Column(name = "reps", nullable = false)
-    private Integer reps;
-
-    @Column(name = "sets", nullable = false)
-    public Integer sets;
-
-    @Column(name = "rest_time",nullable = false) //쉬는 시간 단위(초)
-    public Integer restTime;
-    
-    @Column(name="cycle", nullable = false) //운동주기 단위(주 몇회)
-    public Integer cycle;
-
-    @Column(name = "created_at", nullable = false)
-    public LocalDate createdAt;
+    @Column(name = "exercise_Type", nullable = false)
+    private ExerciseType exerciseType;
 
     @ManyToOne
     @JoinColumn(name = "routine_id")
     private Routine routine;
 
+    @OneToMany(mappedBy = "exercise")
+    private List<ExerciseRecord> exerciseRecords;
+
     @Builder
-    public Exercise(Integer exerciseId,  Routine routine, String exerciseName, Integer weight,
-                    Integer reps, Integer sets, Integer restTime, Integer cycle, LocalDate createdAT){
-        this.exerciseId = exerciseId;
+    public Exercise(Routine routine, ExerciseType exerciseType,  LocalDate createdAT){
         this.routine = routine;
-        this.exerciseName = exerciseName;
-        this.weight = weight;
-        this.reps = reps;
-        this.sets = sets;
-        this.restTime = restTime;
-        this.cycle = cycle;
-        this.createdAt = createdAT;
+        this.exerciseType = exerciseType;
 
     }
 
