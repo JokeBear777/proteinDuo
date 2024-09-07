@@ -1,6 +1,5 @@
 package com.proteinduo.domain.exerciseManage.dto;
 
-import com.proteinduo.domain.exerciseManage.entity.ExerciseType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

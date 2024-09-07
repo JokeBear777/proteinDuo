@@ -39,43 +39,39 @@ public class MemberService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     //회원가입
-    public String save (AddMemberRequest dto) {
-        return memberRepository.save(Member.builder()
-                .memberId(dto.getMemberId())
+    @Transactional
+    public Long save(AddMemberRequest dto) {
+        Member member = Member.builder()
+                .memberId(dto.getMemberId())  // 사용자 입력 ID를 저장 (하지만 기본 키는 Long으로)
                 .password(bCryptPasswordEncoder.encode(dto.getPassword()))
-                .build()).getMemberId();
+                .build();
+        Member savedMember = memberRepository.save(member);
+        return savedMember.getId();  // Long 타입의 ID 반환
     }
 
     //회원 정보 가져오기
     @Transactional
-    public Member getMemberById(String memberId) {
-        Member member = memberRepository.findByMemberId(memberId)
-                .orElseThrow(()-> new IllegalArgumentException("not found"));
 
-        return member;
+    public Member getById(Long id) {
+        return memberRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found with id: " + id));
     }
 
     //회원 정보 입력
     @Transactional
-    public Member memberInfoSave(String memberId, MemberInfoRequest memberInfoRequest){
-        Member member = memberRepository.findByMemberId(memberId)
-                .orElseThrow(()-> new IllegalArgumentException("not found"));
+    public Member memberInfoSave(Long id, MemberInfoRequest memberInfoRequest) {
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found with id: " + id));
         member.update(memberInfoRequest);
-
-        return member;
-
+        return memberRepository.save(member);  // 변경된 정보를 저장
     }
 
     //회원 정보 삭제
     @Transactional
-    public Member memberInfoDelete(String memberId) {
-        Member member = memberRepository.findByMemberId(memberId)
-                .orElseThrow(()-> new IllegalArgumentException("not found"));
+    public void memberInfoDelete(Long id) {
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found with id: " + id));
         member.deleteInfo();
-        return member;
+        memberRepository.delete(member);  // 엔티티를 삭제
     }
-
-
-
-
 }

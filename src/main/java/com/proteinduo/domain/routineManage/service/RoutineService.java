@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +35,7 @@ public class RoutineService {
     private final ExerciseRepository exerciseRepository;
     private final MemberRepository memberRepository;
 
+
     @Autowired
     public RoutineService(RoutineRepository routineRepository,
                        ExerciseRepository exerciseRepository,
@@ -47,6 +50,15 @@ public class RoutineService {
     @Transactional(readOnly = true)
     public List<Routine> getRoutinesByMemberId(String memberId) {
         return routineRepository.findByMember_MemberId(memberId);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isValid(Integer routineId, Principal principal) {
+        String memberId = principal.getName();
+
+        return routineRepository.findByRoutineId(routineId)
+                .map(routine -> routine.getMember().getMemberId().equals(memberId))
+                .orElse(false);
     }
 
     @Transactional
