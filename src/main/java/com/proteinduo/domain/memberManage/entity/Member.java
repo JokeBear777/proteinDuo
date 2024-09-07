@@ -42,6 +42,9 @@ import java.util.List;
 public class Member implements UserDetails { //인증 객체로 사용
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
     @Column(name = "member_id", nullable = false, unique = true, updatable = false)
     private String memberId;
 

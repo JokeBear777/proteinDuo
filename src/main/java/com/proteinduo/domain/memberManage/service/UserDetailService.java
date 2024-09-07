@@ -23,12 +23,21 @@ public class UserDetailService implements UserDetailsService {
 
 
     private final MemberRepository memberRepository;
-    
-    //사용자 ID으로 사용자 정보를 가져오는 메서드
+
+    // 사용자 ID로 사용자 정보를 가져오는 메서드
     @Override
     public Member loadUserByUsername(String loginId) {
-        return memberRepository.findByMemberId(loginId)
-                .orElseThrow(()-> new IllegalArgumentException(loginId));
+
+        // loginId를 Long 타입으로 변환하는 과정 필요
+        Long id;
+        try {
+            id = Long.parseLong(loginId);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid user ID format: " + loginId);
+        }
+
+        return memberRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + id));
     }
 
 }
