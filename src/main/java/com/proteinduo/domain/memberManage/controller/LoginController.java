@@ -36,7 +36,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class LoginController {
 
     private final MemberService memberService;
-    private final UserDetailsService userDetailsService;
 
     // 회원가입
     @PostMapping("/signup")

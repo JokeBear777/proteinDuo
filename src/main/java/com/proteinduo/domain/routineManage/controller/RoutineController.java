@@ -1,5 +1,6 @@
 package com.proteinduo.domain.routineManage.controller;
 
+import com.proteinduo.domain.memberManage.entity.Member;
 import com.proteinduo.domain.routineManage.dto.CreateRoutineDto;
 import com.proteinduo.domain.routineManage.dto.RoutineUpdateDto;
 import com.proteinduo.domain.routineManage.entity.Routine;
@@ -48,25 +49,25 @@ public class RoutineController {
 
     // 사용자 루틴 매핑
     @GetMapping
-    public ModelAndView getMemberRoutine(Principal principal) {
-        String memberId = principal.getName();
+    public String getMemberRoutine(Authentication authentication, Model model) {
+        Member member = (Member) authentication.getPrincipal();
+        String memberId = member.getMemberId();
+
         List<Routine> routines = routineService.getRoutinesByMemberId(memberId);
 
-        ModelAndView mav = new ModelAndView("routineList"); // routineList.html 뷰로 반환
-        mav.addObject("routines", routines); // 모델에 루틴 데이터 추가
-        return mav;
+        model.addAttribute("routines", routines);
+        return "routineList";
     }
 
     // 루틴 정보 매핑
     @GetMapping("/{routineId}")
     @PreAuthorize("@routineSecurityService.hasAccessToRoutine(#routineId, principal)")
-    public ModelAndView getRoutine(@PathVariable Integer routineId, Principal principal) {
+    public String getRoutine(@PathVariable Integer routineId, Principal principal, Model model) {
         Optional<Routine> routine = routineService.getRoutineById(routineId);
 
         if (routine.isPresent()) {
-            ModelAndView mav = new ModelAndView("routineDetail"); // routineDetail.html 뷰로 반환
-            mav.addObject("routine", routine.get());
-            return mav;
+            model.addAttribute("routine", routine.get());
+            return "routineDetail";
         } else {
             throw new IllegalArgumentException("Routine not found for ID: " + routineId);
         }
