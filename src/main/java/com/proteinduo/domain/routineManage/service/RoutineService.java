@@ -51,7 +51,7 @@ public class RoutineService {
     public List<Routine> getRoutinesByMemberId(String memberId) {
         return routineRepository.findByMember_MemberId(memberId);
     }
-
+    /**
     @Transactional(readOnly = true)
     public boolean isValid(Integer routineId, Principal principal) {
         String memberId = principal.getName();
@@ -60,6 +60,7 @@ public class RoutineService {
                 .map(routine -> routine.getMember().getMemberId().equals(memberId))
                 .orElse(false);
     }
+     **/
 
     @Transactional
     public Optional<Routine> getRoutineById(Integer routineId) {
@@ -107,9 +108,6 @@ public class RoutineService {
         else {
             throw new RuntimeException("Routine not found");
         }
-
-
-
     }
 
 }

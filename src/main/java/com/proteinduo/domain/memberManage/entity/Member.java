@@ -1,5 +1,7 @@
 package com.proteinduo.domain.memberManage.entity;
 
+import com.fasterxml.jackson.databind.deser.DataFormatReaders;
+import com.proteinduo.domain.matchingManage.entity.Matching;
 import com.proteinduo.domain.memberManage.dto.MemberInfoRequest;
 import com.proteinduo.domain.routineManage.entity.Routine;
 import jakarta.persistence.*;
@@ -82,6 +84,9 @@ public class Member implements UserDetails { //인증 객체로 사용
 
     @OneToMany(mappedBy = "member")
     private List<Routine> routine;
+
+    @OneToOne(mappedBy = "matching")
+    private Matching matching;
 
     @Builder
     public Member(String memberId, String password, String username, String email,  String gender,

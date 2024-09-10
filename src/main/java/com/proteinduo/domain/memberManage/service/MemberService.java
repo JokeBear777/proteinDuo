@@ -51,7 +51,6 @@ public class MemberService {
 
     //회원 정보 가져오기
     @Transactional
-
     public Member getById(Long id) {
         return memberRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found with id: " + id));
