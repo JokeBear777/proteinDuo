@@ -1,25 +1,20 @@
 package com.proteinduo.domain.routineManage.controller;
 
-import com.proteinduo.domain.memberManage.entity.Member;
+import com.proteinduo.infrastructure.security.config.CustomUserDetails;
 import com.proteinduo.domain.routineManage.dto.CreateRoutineDto;
+import com.proteinduo.domain.routineManage.dto.GetRoutineInfoDto;
+import com.proteinduo.domain.routineManage.dto.GetRoutinesInfoDto;
 import com.proteinduo.domain.routineManage.dto.RoutineUpdateDto;
-import com.proteinduo.domain.routineManage.entity.Routine;
-import com.proteinduo.domain.routineManage.service.RoutineSecurityService;
 import com.proteinduo.domain.routineManage.service.RoutineService;
+import com.proteinduo.infrastructure.security.util.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
-import java.security.Principal;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * packageName    : com.proteinduo.domain.routineManage.api
@@ -38,78 +33,64 @@ import java.util.Optional;
 public class RoutineController {
 
     private final RoutineService routineService;
-    private final RoutineSecurityService routineSecurityService;
 
     @Autowired
-    public RoutineController(RoutineService routineService,
-                             RoutineSecurityService routineSecurityService) {
+    public RoutineController(RoutineService routineService) {
         this.routineService = routineService;
-        this.routineSecurityService = routineSecurityService;
     }
 
-    // 사용자 루틴 매핑
+
+    /**
+     * 사용자의 루틴 목록을 조회하여 반환
+     *
+     * @param model 뷰에 전달할 데이터 모델
+     * @return 루틴이 없을 경우 빈 리스트, 있을 경우 루틴 리스트를 반환하여 routineList 템플릿에서 동적으로 처리
+     */
     @GetMapping
-    public String getMemberRoutine(Authentication authentication, Model model) {
-        Member member = (Member) authentication.getPrincipal();
-        String memberId = member.getMemberId();
+    public String getMemberRoutine(Model model) {
+        /**CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long Id = customUserDetails.getId();
+         **/
+        Long Id = SecurityUtil.getCurrentUserId();
 
-        List<Routine> routines = routineService.getRoutinesByMemberId(memberId);
-
-        model.addAttribute("routines", routines);
+        List<GetRoutinesInfoDto> getRoutinesInfoDtos = routineService.getRoutinesByMemberId(Id);
+        model.addAttribute("routines", getRoutinesInfoDtos);
         return "routineList";
     }
 
     // 루틴 정보 매핑
     @GetMapping("/{routineId}")
     @PreAuthorize("@routineSecurityService.hasAccessToRoutine(#routineId, principal)")
-    public String getRoutine(@PathVariable Integer routineId, Principal principal, Model model) {
-        Optional<Routine> routine = routineService.getRoutineById(routineId);
-
-        if (routine.isPresent()) {
-            model.addAttribute("routine", routine.get());
-            return "routineDetail";
-        } else {
-            throw new IllegalArgumentException("Routine not found for ID: " + routineId);
-        }
+    public String getRoutine(@PathVariable Integer routineId, Model model) {
+        GetRoutineInfoDto getRoutineInfoDto = routineService.getRoutineById(routineId);
+        model.addAttribute("routine", getRoutineInfoDto);
+        return "routineDetail";
     }
 
     // 루틴 생성
     @PostMapping()
-    public String createRoutine(Principal principal, @ModelAttribute CreateRoutineDto createRoutineDto, Model model) {
-        String memberId = principal.getName();
-        Routine routine = routineService.createRoutine(memberId, createRoutineDto);
-        model.addAttribute("routine", routine);
+    public String createRoutine(@ModelAttribute CreateRoutineDto createRoutineDto, Model model,
+                                Authentication authentication) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long Id = customUserDetails.getId();
 
-        // 루틴 생성 후 루틴 목록 페이지로 리다이렉트
-        return "redirect:/routine";
+        routineService.createRoutine(Id, createRoutineDto);
+        return "redirect:/routine"; // 루틴 생성 후 루틴 목록 페이지로 리다이렉트
     }
 
     // 루틴 정보 수정
     @PostMapping("/{routineId}")
     @PreAuthorize("@routineSecurityService.hasAccessToRoutine(#routineId, principal)")
     public String updateRoutine(@PathVariable Integer routineId, @ModelAttribute RoutineUpdateDto updateDto, Model model) {
-        Optional<Routine> routine = routineService.getRoutineById(routineId);
-
-        if (routine.isPresent()) {
-            routineService.updateRoutine(routineId, updateDto);
-            model.addAttribute("routine", routine.get());
-            return "redirect:/routine/" + routineId; // 수정 후 루틴 세부 페이지로 리다이렉트
-        } else {
-            throw new IllegalArgumentException("Routine not found for ID: " + routineId);
-        }
+        routineService.updateRoutine(routineId, updateDto);
+        return "redirect:/routine/" + routineId; // 수정 후 루틴 세부 페이지로 리다이렉트
     }
 
     // 루틴 삭제
     @DeleteMapping("/{routineId}")
     @PreAuthorize("@routineSecurityService.hasAccessToRoutine(#routineId, principal)")
     public String deleteRoutine(@PathVariable Integer routineId) {
-        Optional<Routine> routine = routineService.getRoutineById(routineId);
-
-        if (routine.isPresent()) {
-            routineService.deleteRoutine(routineId);
-            return "redirect:/routine"; // 삭제 후 루틴 목록 페이지로 리다이렉트
-        } else {
-            throw new IllegalArgumentException("Routine not found for ID: " + routineId);
-        }
+        routineService.deleteRoutine(routineId);
+        return "redirect:/routine"; // 삭제 후 루틴 목록 페이지로 리다이렉트
     }
 }

@@ -1,9 +1,12 @@
-package com.proteinduo.domain.memberManage.service;
+package com.proteinduo.infrastructure.security.service;
 
+import com.proteinduo.infrastructure.security.config.CustomUserDetails;
 import com.proteinduo.domain.memberManage.repository.MemberRepository;
 import com.proteinduo.domain.memberManage.entity.Member;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 /**
@@ -26,18 +29,11 @@ public class UserDetailService implements UserDetailsService {
 
     // 사용자 ID로 사용자 정보를 가져오는 메서드
     @Override
-    public Member loadUserByUsername(String loginId) {
+    public UserDetails loadUserByUsername(String memberId) throws UsernameNotFoundException {
+        Member member = memberRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        // loginId를 Long 타입으로 변환하는 과정 필요
-        Long id;
-        try {
-            id = Long.parseLong(loginId);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid user ID format: " + loginId);
-        }
-
-        return memberRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + id));
+        return new CustomUserDetails(member);  // Member 엔티티를 CustomUserDetails로 변환
     }
 
 }

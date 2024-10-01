@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -26,17 +27,18 @@ public class Exercise {
     @Column(name = "exercise_Type", nullable = false)
     private ExerciseType exerciseType;
 
-    @ManyToOne
-    @JoinColumn(name = "routine_id")
-    private Routine routine;
+    //비연관 매핑
+    @Column(name = "routine_id", nullable = false, updatable = false)
+    private  Long routineId;
 
-    @OneToMany(mappedBy = "exercise")
-    private List<ExerciseRecord> exerciseRecords;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "exercise_record_Id")
+    private List<ExerciseRecord> exerciseRecords = new ArrayList<>();
 
     @Builder
-    public Exercise(Routine routine, ExerciseType exerciseType,  LocalDate createdAT){
-        this.routine = routine;
+    public Exercise(ExerciseType exerciseType, Long routineId) {
         this.exerciseType = exerciseType;
+        this.routineId = routineId;
 
     }
 

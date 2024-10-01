@@ -3,6 +3,7 @@ package com.proteinduo.domain.routineManage.service;
 
 import com.proteinduo.domain.routineManage.entity.Routine;
 import com.proteinduo.domain.routineManage.repository.RoutineRepository;
+import com.proteinduo.infrastructure.security.util.SecurityUtil;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -18,13 +19,16 @@ public class RoutineSecurityService {
     }
 
     public boolean hasAccessToRoutine(Integer routineId, Principal principal) {
-        String currentUserName = principal.getName();
-        Optional<Routine> routine = routineRepository.findById(routineId);
+        Long currentUserId = SecurityUtil.getCurrentUserId();
 
-        return routine.map(r -> r.getMember().getMemberId().equals(currentUserName))
-                .orElse(false);
+        Routine routine = routineRepository.findById(routineId)
+                .orElseThrow(()-> new RuntimeException("Routine not found"));
 
+        if (!currentUserId.equals(routine.getMemberLongId())) {
+            return false;
+        }
 
+        return true;
     }
 
 

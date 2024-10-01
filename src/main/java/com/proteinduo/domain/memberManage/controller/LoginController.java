@@ -1,11 +1,11 @@
 package com.proteinduo.domain.memberManage.controller;
 
-import com.proteinduo.domain.memberManage.dto.AddMemberRequest;
+import com.proteinduo.domain.memberManage.dto.AddMemberRequestDto;
 import com.proteinduo.domain.memberManage.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -37,9 +37,15 @@ public class LoginController {
 
     private final MemberService memberService;
 
+    //로그인
+    @GetMapping("/login")
+    public String login() {
+        return "/login";
+    }
+
     // 회원가입
     @PostMapping("/signup")
-    public String signup(@ModelAttribute AddMemberRequest request, Model model) {
+    public String signup(@ModelAttribute AddMemberRequestDto request, Model model) {
         memberService.save(request);
         model.addAttribute("message", "Signup successful. Please log in.");
 

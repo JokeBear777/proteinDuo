@@ -21,7 +21,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddMemberRequest {
+public class AddMemberRequestDto {
     private String memberId;
     private String password;
 }

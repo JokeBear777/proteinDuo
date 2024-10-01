@@ -1,18 +1,15 @@
 package com.proteinduo.domain.memberManage.controller;
 
+import com.proteinduo.domain.memberManage.dto.GetMemberInfoDto;
 import com.proteinduo.domain.memberManage.dto.MemberInfoRequest;
-import com.proteinduo.domain.memberManage.entity.Member;
 import com.proteinduo.domain.memberManage.service.MemberSecurityService;
 import com.proteinduo.domain.memberManage.service.MemberService;
-import com.proteinduo.domain.memberManage.service.UserDetailService;
+import com.proteinduo.infrastructure.security.service.UserDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
 /**
  * packageName    : com.proteinduo.domain.memberManage.api
@@ -47,15 +44,11 @@ public class MemberController {
     // 유저 정보 READ
     @GetMapping
     @PreAuthorize("@memberSecurityService.hasAccessToMember(#Id, principal)")
-    public ModelAndView getMemberInfo(@PathVariable Long Id) {
-        Member member = memberService.getById(Id);
-        if (member == null) {
-            throw new IllegalArgumentException("Member not found for ID: " + Id);
-        }
+    public String getMemberInfo(@PathVariable Long Id, Model model) {
+        GetMemberInfoDto getMemberInfoDto = memberService.getMemberInfoById(Id);
+        model.addAttribute("memberInfoDto", getMemberInfoDto);
 
-        ModelAndView mav = new ModelAndView("memberInfo"); // memberInfo.html 뷰로 반환
-        mav.addObject("member", member); // 모델에 member 데이터 추가
-        return mav;
+        return "memberInfo";
     }
 
     // 유저 정보 CREATE || UPDATE
