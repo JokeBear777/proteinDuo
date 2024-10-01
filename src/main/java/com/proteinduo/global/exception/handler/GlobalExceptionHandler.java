@@ -1,6 +1,7 @@
-package com.proteinduo.global.exception;
+package com.proteinduo.global.exception.handler;
 
 
+import com.proteinduo.global.exception.exception.PeriodNotSatisfiedException;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -22,4 +23,13 @@ public class GlobalExceptionHandler {
         model.addAttribute("message", "Something went wrong: " + ex.getMessage());  // 에러 메시지 전달
         return "errorPage";  // 에러 페이지 뷰 이름
     }
+
+    @ExceptionHandler(PeriodNotSatisfiedException.class)
+    public String handlePeriodNotSatisfiedException(PeriodNotSatisfiedException ex, Model model) {
+        model.addAttribute("message", "Something went wrong: " + ex.getMessage());  // 에러 메시지 전달
+        //redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        return "errorPage"; // 매칭 페이지로 리다이렉트
+    }
+
+
 }

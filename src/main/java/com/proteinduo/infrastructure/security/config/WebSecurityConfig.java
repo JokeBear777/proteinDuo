@@ -1,6 +1,6 @@
-package com.proteinduo.domain.memberManage.config;
+package com.proteinduo.infrastructure.security.config;
 
-import com.proteinduo.domain.memberManage.service.UserDetailService;
+import com.proteinduo.infrastructure.security.service.UserDetailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,12 +10,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-
-import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
 
 /**
  * packageName    : com.proteinduo.domain.memberManage.config
@@ -34,6 +30,7 @@ import static org.springframework.boot.autoconfigure.security.servlet.PathReques
 public class WebSecurityConfig {
 
     private final UserDetailService userDetailService;
+    //private final CustomUserDetailsService userDetailService;
 
     /**
      * 스프링 시큐리티 기능 비활성화
@@ -58,13 +55,13 @@ public class WebSecurityConfig {
         return http
                 .authorizeHttpRequests((authorizeRequests) ->
                         authorizeRequests
-                                .requestMatchers("/", "/login/**", "/signup/**").permitAll() //메인화면, 로그인, 회원가입 접근허용
+                                .requestMatchers("/", "/login/**", "/signup/**", "/static/**").permitAll() //메인화면, 로그인, 회원가입 접근허용
                                 .anyRequest().authenticated()
                 )
                 //폼 기반 로그인 설정
                 .formLogin((form) -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("/home", true)
+                        .defaultSuccessUrl("/home", true) //성공하면 home 뷰로
                         .permitAll()
                 )
                 //로그아웃 설정

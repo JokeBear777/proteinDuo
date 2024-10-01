@@ -2,9 +2,12 @@ package com.proteinduo.domain.exerciseManage.controller;
 
 
 import com.proteinduo.domain.exerciseManage.dto.AddExerciseDto;
+import com.proteinduo.domain.exerciseManage.dto.GetExerciseInfoDto;
+import com.proteinduo.domain.exerciseManage.dto.GetExerciseSimpleInfoDto;
 import com.proteinduo.domain.exerciseManage.dto.UpdateExerciseDto;
 import com.proteinduo.domain.exerciseManage.entity.Exercise;
 import com.proteinduo.domain.exerciseManage.service.ExerciseService;
+import com.proteinduo.domain.routineManage.dto.GetRoutineInfoDto;
 import com.proteinduo.domain.routineManage.entity.Routine;
 import com.proteinduo.domain.routineManage.service.RoutineService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,36 +41,33 @@ public class ExerciseController {
     @GetMapping()
     @PreAuthorize("@routineSecurityService.hasAccessToRoutine(#routineId, principal)")
     public String getAllExercises(@PathVariable Integer routineId, Model model) {
-        Optional<Routine> routineOptional = routineService.getRoutineById(routineId);
+        List<GetExerciseSimpleInfoDto> getExerciseSimpleInfoDtoList = routineService.getExercisesByRoutineId(routineId);
+        model.addAttribute("getExercisesSimpleInfoDtoList", getExerciseSimpleInfoDtoList); // 모델에 데이터를 담음
+        return "exerciseList"; // 렌더링할 템플릿 이름 반환
 
-        if (routineOptional.isPresent()) {
-            List<Exercise> exercises = routineOptional.get().getExercises();
-            model.addAttribute("exercises", exercises); // 모델에 데이터를 담음
-            return "exerciseList"; // 렌더링할 템플릿 이름 반환
-        } else {
-            throw new IllegalArgumentException("Routine not found for ID: " + routineId);
-        }
     }
 
     // 운동 생성
     @PostMapping()
     @PreAuthorize("@routineSecurityService.hasAccessToRoutine(#routineId, principal)")
     public String createExercise(@PathVariable Integer routineId, @ModelAttribute AddExerciseDto addExerciseDto, Model model) {
-        Exercise exercise = exerciseService.createExercise(addExerciseDto, routineId);
-        model.addAttribute("exercise", exercise);
+        exerciseService.createExercise(addExerciseDto, routineId);
         return "redirect:/routine/" + routineId + "/exercise"; // 운동 생성 후 목록 페이지로 리다이렉트
     }
 
-    // 운동 조회
+    /**
+     *
+     * 운동조회, 본인의 최근 n회 의 exerciseRecords도 함께 반환하여, 뷰에서 그래프로 추이를 그린다
+     * 우선 n은 7로 정함, 추후 필요에 따라 유동적으로 변함
+     * @return
+     */
     @GetMapping("/{exerciseId}")
     @PreAuthorize("@exerciseSecurityService.hasAccessToExerciseAndRoutine(#exerciseId, #routineId, principal)")
     public String getExercise(@PathVariable Long exerciseId, @PathVariable Integer routineId, Model model) {
-        return exerciseService.getExerciseByExerciseId(exerciseId)
-                .map(exercise -> {
-                    model.addAttribute("exercise", exercise);
-                    return "exerciseDetail"; // 운동 세부 페이지 템플릿 반환
-                })
-                .orElse("error/404"); // 존재하지 않는 경우 404 오류 페이지 반환
+        GetExerciseInfoDto getExerciseInfoDto =  exerciseService.getExerciseByExerciseId(exerciseId);
+        model.addAttribute("exercise", getExerciseInfoDto);
+        return "exerciseDetail"; // 운동 세부 페이지 템플릿 반환
+
     }
 
     // 운동 업데이트
@@ -77,31 +77,19 @@ public class ExerciseController {
             @PathVariable Integer routineId, @PathVariable Long exerciseId,
             @ModelAttribute UpdateExerciseDto updateExerciseDto, Model model) {
 
-        Optional<Exercise> exerciseOptional = exerciseService.getExerciseByExerciseId(exerciseId);
+        exerciseService.updateExercise(exerciseId, updateExerciseDto);
+        GetExerciseInfoDto getExerciseInfoDto =  exerciseService.getExerciseByExerciseId(exerciseId);
+        model.addAttribute("exercise", getExerciseInfoDto);
+        return "exerciseDetail"; // 수정된 후 운동 세부 페이지로 이동
 
-        if (exerciseOptional.isPresent()) {
-            Exercise updatedExercise = exerciseService.updateExercise(exerciseId, updateExerciseDto);
-            model.addAttribute("exercise", updatedExercise);
-            return "exerciseDetail"; // 수정된 후 운동 세부 페이지로 이동
-        } else {
-            throw new IllegalArgumentException("Exercise not found for ID: " + exerciseId);
-        }
     }
 
    //운동 삭제
     @DeleteMapping("/{exerciseId}")
     @PreAuthorize("@exerciseSecurityService.hasAccessToExerciseAndRoutine(#exerciseId, #routineId, principal)")
-    public String deleteExercise(@PathVariable Long exerciseId, @PathVariable Integer routineId
-    , Model model) {
-        Optional<Exercise> exerciseOptional = exerciseService.getExerciseByExerciseId(exerciseId);
-
-        if (exerciseOptional.isPresent()) {
-            exerciseService.deleteExercise(exerciseId);
-            return "redirect:/routine/" + routineId + "/exercise";
-        } else {
-            throw new IllegalArgumentException("Exercise not found for ID: " + exerciseId);
-        }
-
+    public String deleteExercise(@PathVariable Long exerciseId, @PathVariable Integer routineId) {
+        exerciseService.deleteExercise(exerciseId);
+        return "redirect:/routine/" + routineId + "/exercise";
     }
 
 }

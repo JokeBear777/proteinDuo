@@ -1,8 +1,6 @@
 package com.proteinduo.domain.memberManage.configure;
 
-import com.proteinduo.domain.memberManage.dto.AddMemberRequest;
-import com.proteinduo.domain.memberManage.entity.Member;
-import com.proteinduo.domain.memberManage.repository.MemberRepository;
+import com.proteinduo.domain.memberManage.dto.AddMemberRequestDto;
 import com.proteinduo.domain.memberManage.service.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MockMvcBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -54,8 +51,8 @@ public class SecurityConfigTest {
                 .apply(springSecurity())
                 .build();
 
-        AddMemberRequest addMemberRequest = new AddMemberRequest("abcd", "1234");
-        memberService.save(addMemberRequest);
+        AddMemberRequestDto addMemberRequestDto = new AddMemberRequestDto("abcd", "1234");
+        memberService.save(addMemberRequestDto);
     }
 
     @Test

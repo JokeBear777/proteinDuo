@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,7 +33,7 @@ public class Routine {
     @Id
     @Column(name = "routine_id", nullable = false, unique = true, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer routineId;
+    private Long routineId;
 
     @Column(name = "routine_name", nullable = false, updatable = true)
     private String routineName;
@@ -44,19 +45,20 @@ public class Routine {
     @Column(name = "per_week", nullable = false, updatable = true)
     private Integer perWeek;
 
-    @ManyToOne
-    @JoinColumn(name = "member_id") // 외래 키 컬럼의 이름을 지정
-    private Member member;
+    //비연관 매핑
+    @Column(name = "member_long_id", nullable = false, updatable = false)
+    private Long memberLongId;
 
-    @OneToMany(mappedBy = "routine")
-    private List<Exercise> exercises;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "exercise_id")
+    private List<Exercise> exercises = new ArrayList<>();
 
     @Builder
-    public Routine(Member member, String routineName, LocalDate createdAt, Integer perWeek) {
-        this.member = member;
+    public Routine(String routineName, LocalDate createdAt, Integer perWeek, Long memberLongId) {
         this.routineName = routineName;
         this.createdAt = createdAt;
         this.perWeek = perWeek;
+        this.memberLongId = memberLongId;
     }
 
 
